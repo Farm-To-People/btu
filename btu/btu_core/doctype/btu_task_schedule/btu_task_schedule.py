@@ -282,7 +282,7 @@ def schedule_to_cron_string(doc_schedule):
 	if not doc_schedule.day_of_month:
 		cron[2] = "*"
 	else:
-		str(doc_schedule.day_of_month)
+		cron[2] = str(doc_schedule.day_of_month)
 
 	cron[3] = "*" if doc_schedule.month is None else doc_schedule.month
 

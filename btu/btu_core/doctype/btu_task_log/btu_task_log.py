@@ -177,8 +177,11 @@ def check_in_progress_logs_for_timeout(verbose=False):
 		except Exception as ex:
 			raise ValueError("Value of 'Max Task Duration' should be an integer representing seconds.") from ex
 
-		log_creation_tz_aware = make_datetime_naive(doc_log.creation) if is_datetime_naive(doc_log.creation) else doc_log.creation
-		seconds_since_log_creation = (datetime_now_tz_aware - log_creation_tz_aware).total_seconds()
+		# Ensure we can compare datetimes properly
+		# Database returns naive datetimes, so make both naive for comparison
+		log_creation = make_datetime_naive(doc_log.creation) if not is_datetime_naive(doc_log.creation) else doc_log.creation
+		datetime_now = make_datetime_naive(datetime_now_tz_aware)
+		seconds_since_log_creation = (datetime_now - log_creation).total_seconds()
 		if seconds_since_log_creation > max_task_duration:
 			print(f"BTU Task Log {doc_log.name}.  {seconds_since_log_creation} seconds have passed since creation.  Changing status from 'In-Progress' to 'Failed'")
 			doc_log.success_fail = 'Timeout'
